@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinguaPro v29 - Full Kelime & Stüdyo Sürümü</title>
+  <style>
+    :root {
+        --bg: #ffffff;
+        --card-bg: #f8f9fa;
+        --text: #2d3748;
+        --text-muted: #718096;
+        --primary: #58cc02;
+        --secondary: #1cb0f6;
+        --warning: #ffc800;
+        --danger: #ff4b4b;
+        --gem: #ce82ff;
+        --border: #e2e8f0;
+    }
+
+    body.dark-mode {
+        --bg: #131f24;
+        --card-bg: #1f2e35;
+        --text: #ffffff;
+        --text-muted: #aaf;
+        --border: #37464f;
+    }
+
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+    }
+
+    .app-container {
+        width: 100%;
+        max-width: 400px;
+        background: var(--bg);
+        padding: 20px;
+        box-sizing: border-box;
+        margin-top: 10px;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .header.hidden {
+        display: none;
+    }
+
+    .back-btn {
+        background: none;
+        border: none;
+        color: var(--text);
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .progress-bar-container {
+        flex-grow: 1;
+        height: 12px;
+        background: var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--primary);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .stats-group {
+        display: flex;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .screen {
+        display: none;
+    }
+
+    .screen.active {
+        display: block;
+    }
+
+    .top-action-bar {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 4px;
+        margin-bottom: 20px;
+    }
+
+    .top-btn {
+        background: var(--card-bg);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 8px 2px;
+        font-size: 9px;
+        font-weight: bold;
+        color: var(--text);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .top-btn span {
+        font-size: 14px;
+    }
+
+    .menu-title {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--primary);
+        text-align: center;
+        margin-bottom: 4px;
+    }
+
+    .menu-subtitle {
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+    }
+
+    .category-card {
+        background: var(--card-bg);
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+
+    .character-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .character-avatar {
+        font-size: 40px;
+        background: var(--card-bg);
+        border: 2px solid var(--border);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .speech-bubble {
+        background: var(--card-bg);
+        border: 2px solid var(--border);
+        padding: 10px 15px;
+        border-radius: 12px;
+        font-size: 13px;
+        flex-grow: 1;
+    }
+
+    .question-box {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+
+    .audio-controls {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .audio-btn {
+        background: var(--secondary);
+        border: none;
+        color: white;
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        flex: 1;
+        font-weight: bold;
+    }
+
+    .mic-btn {
+        background: var(--danger);
+    }
+
+    .mic-btn.recording {
+        background: #c53030;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .option-btn {
+        background: var(--card-bg);
+        border: 2px solid var(--border);
+        border-bottom-width: 4px;
+        border-radius: 14px;
+        padding: 12px;
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .option-btn.selected {
+        border-color: var(--secondary);
+        background: rgba(28, 176, 246, 0.1);
+    }
+
+    .footer-card {
+        padding: 15px;
+        border-radius: 14px;
+        margin-bottom: 15px;
+    }
+
+    .footer-card.hidden {
+        display: none;
+    }
+
+    .footer-card.correct {
+        background: rgba(88, 204, 2, 0.15);
+        border: 2px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .footer-card.wrong {
+        background: rgba(255, 75, 75, 0.15);
+        border: 2px solid var(--danger);
+        color: var(--danger);
+    }
+
+    .pro-btn {
+        width: 100%;
+        background: var(--primary);
+        border: none;
+        border-bottom: 4px solid #45a002;
+        border-radius: 14px;
+        padding: 14px;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .pro-btn:disabled {
+        background: var(--border);
+        border-bottom-color: #cbd5e0;
+        color: var(--text-muted);
+        cursor: not-allowed;
+    }
+
+    .badge-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .badge {
+        font-size: 28px;
+        background: var(--card-bg);
+        border: 2px solid var(--border);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.3;
+    }
+
+    .badge.unlocked {
+        opacity: 1;
+        border-color: var(--warning);
+        background: rgba(255, 200, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Üst İstatistik Alanı -->
+  <div id="topStats" class="header hidden">
+    <button id="menuBackBtn" class="back-btn">✕ Menü</button>
+    <div class="progress-bar-container">
+      <div id="progressBar" class="progress-bar"></div>
+    </div>
+    <div class="stats-group">
+      <span id="statHearts">❤️❤️❤️</span>
+      <span>🔥<span id="statStreak">1</span></span>
+      <span>💎<span id="statGems">50</span></span>
+    </div>
+  </div>
+
+  <!-- 1. ANA MENÜ EKRANI -->
+  <div id="menuScreen" class="screen active">
+    <div class="top-action-bar">
+      <button class="top-btn" id="themeBtn"><span>🌙</span>Tema</button>
+      <button class="top-btn" id="dictBtn"><span>📖</span>Sözlük</button>
+      <button class="top-btn" id="shopBtn"><span>🛒</span>Mağaza</button>
+      <button class="top-btn" id="studioBtn"><span>🎙️</span>Stüdyo</button>
+      <button class="top-btn" id="profileBtn"><span>👤</span>Profil</button>
+      <button class="top-btn" id="questBtn"><span>🎯</span>Görev</button>
+    </div>
+
+    <div class="menu-title">LinguaPro v29</div>
+    <div class="menu-subtitle">Dev Kelime Arşivi & Ses Stüdyosu</div>
+
+    <div class="category-card" data-level="beginner">
+      <div>
+        <h3 style="margin:0 0 2px 0; color:var(--primary); font-size:14px;">🌱 Temel Seviye (A1-A2)</h3>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);">En sık kullanılan temel kalıplar.</p>
+      </div>
+      <span style="font-weight:bold; color:var(--primary);">➔</span>
+    </div>
+
+    <div class="category-card" data-level="intermediate">
+      <div>
+        <h3 style="margin:0 0 2px 0; color:var(--secondary); font-size:14px;">🚀 Orta Seviye (B1-B2)</h3>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);">Zamanlar ve akıcı cümleler.</p>
+      </div>
+      <span style="font-weight:bold; color:var(--secondary);">➔</span>
+    </div>
+
+    <div class="category-card" data-level="advanced">
+      <div>
+        <h3 style="margin:0 0 2px 0; color:var(--warning); font-size:14px;">⚡ İleri Seviye (C1-C2)</h3>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);">Akademik yapılar ve profesyonel metinler.</p>
+      </div>
+      <span style="font-weight:bold; color:var(--warning);">➔</span>
+    </div>
+
+    <div class="category-card" data-level="daily">
+      <div>
+        <h3 style="margin:0 0 2px 0; color:var(--gem); font-size:14px;">💡 Pratik Kelime & Deyimler</h3>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);">Günlük hayatın vazgeçilmez kalıpları.</p>
+      </div>
+      <span style="font-weight:bold; color:var(--gem);">➔</span>
+    </div>
+
+    <div style="margin-top:10px; text-align:center; font-size:13px; color:var(--text-muted);">
+      Toplam Deneyim: <b id="totalLifetimeXP" style="color:var(--secondary);">0</b> XP
+    </div>
+  </div>
+
+  <!-- 2. QUIZ EKRANI -->
+  <div id="quizScreen" class="screen">
+    <div class="character-container">
+      <div class="character-avatar" id="charAvatar">🦉</div>
+      <div class="speech-bubble" id="charSpeech">Hoo-hoo! Geniş kelime arşivi devrede!</div>
+    </div>
+
+    <div class="question-box" id="questionText">Soru yükleniyor...</div>
+    
+    <div class="audio-controls">
+      <button class="audio-btn" id="audioBtn">🔊 Dinle</button>
+      <button class="audio-btn mic-btn" id="micBtn">🎙️ Sesini Kaydet</button>
+      <button class="audio-btn" id="playRecBtn" style="background:var(--warning); color:#000;" disabled>▶ Kaydımı Dinle</button>
+    </div>
+    
+    <div class="options-container" id="optionsContainer"></div>
+
+    <div id="feedbackCard" class="footer-card hidden">
+      <div id="feedbackTitle" style="font-size:14px; margin-bottom:2px;">Harika!</div>
+      <div id="feedbackSub" style="font-size:12px;"></div>
+    </div>
+
+    <button class="pro-btn" id="checkBtn" disabled>KONTROL ET</button>
+  </div>
+
+  <!-- 3. SES STÜDYOSU ÖZEL EKRANI -->
+  <div id="studioScreen" class="screen" style="text-align:center;">
+    <h2 style="color:var(--secondary); margin-top:0; font-size:20px;">🎙️ Gerçek Ses Stüdyosu</h2>
+    <p style="color:var(--text-muted); font-size:13px; margin-bottom:15px;">Kelime telaffuzunu kaydet ve kendi sesini test et!</p>
+    
+    <div style="background:var(--card-bg); padding:20px; border-radius:12px; border:2px solid var(--border); margin-bottom:15px;">
+      <p style="font-size:14px; font-weight:bold; margin-bottom:10px;">Stüdyo Mikrofon Durumu</p>
+      <button class="pro-btn mic-btn" id="studioMicBtn" style="margin-bottom:10px;">🎙️ Kaydı Başlat / Durdur</button>
+      <p id="studioStatus" style="font-size:12px; color:var(--text-muted); margin:0;">Mikrofon bekleniyor...</p>
+    </div>
+
+    <button class="pro-btn" id="studioPlayBtn" style="background:var(--warning); color:#000; margin-bottom:10px;" disabled>▶ Stüdyo Kaydını Dinle</button>
+    <button class="pro-btn" id="studioBackBtn">ANA MENÜYE DÖN</button>
+  </div>
+
+  <!-- 4. BİTİŞ EKRANI -->
+  <div id="finishScreen" class="screen" style="text-align:center;">
+    <div style="font-size:48px; margin-bottom:10px;">🦉🏆</div>
+    <h2 style="color:var(--primary); font-size:22px;">Ders Tamamlandı!</h2>
+    <p style="color:var(--text-muted); font-size:13px;">Kelime havuzunu başarıyla taradın.</p>
+    
+    <div style="background:var(--card-bg); padding:15px; border-radius:12px; margin:20px 0; border:2px solid var(--border);">
+      <p style="margin:5px 0; font-size:14px;">Kazanılan XP: <b id="finalXP" style="color:var(--secondary);">0</b></p>
+      <p style="margin:5px 0; font-size:14px;">Kazanılan Elmas: <b style="color:var(--warning);">+15 💎</b></p>
+    </div>
+    
+    <button class="pro-btn" id="finishBackBtn">ANA MENÜYE DÖN</button>
+  </div>
+
+  <!-- 5. SÖZLÜK EKRANI -->
+  <div id="dictScreen" class="screen">
+    <h2 style="color:var(--secondary); text-align:center; margin-top:0; font-size:20px;">📖 Sözlük Deposu</h2>
+    <div id="dictList" style="max-height:250px; overflow-y:auto; margin:15px 0;"></div>
+    <button class="pro-btn" id="dictBackBtn">GERİ DÖN</button>
+  </div>
+
+  <!-- 6. MAĞAZA EKRANI -->
+  <div id="shopScreen" class="screen" style="text-align:center;">
+    <h2 style="color:var(--warning); margin-top:0; font-size:20px;">🛒 Mağaza</h2>
+    <p style="color:var(--text-muted); font-size:13px; margin-bottom:15px;">Elmaslarını harcayarak güçlendirici al!</p>
+    
+    <div class="category-card" id="buyHeartBtn" style="justify-content:space-between; margin-bottom:10px;">
+      <div style="text-align:left;">
+        <h4 style="margin:0 0 4px 0; color:var(--danger); font-size:14px;">❤️ Can Dolumu (+1 Kalp)</h4>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);">Mevcut canını yeniler.</p>
+      </div>
+      <span style="font-weight:bold; color:var(--warning); font-size:13px;">20 💎</span>
+    </div>
+
+    <div class="category-card" id="buyBonusBtn" style="justify-content:space-between; margin-bottom:15px;">
+      <div style="text-align:left;">
+        <h4 style="margin:0 0 4px 0; color:var(--gem); font-size:14px;">🎁 Günlük Sandık Ödülü</h4>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);">Anında +25 Elmas kazan.</p>
+      </div>
+      <span style="font-weight:bold; color:var(--primary); font-size:13px;">ÜCRETSİZ</span>
+    </div>
+    
+    <button class="pro-btn" id="shopBackBtn">GERİ DÖN</button>
+  </div>
+
+  <!-- 7. PROFİL EKRANI -->
+  <div id="profileScreen" class="screen" style="text-align:center;">
+    <h2 style="color:var(--primary); margin-top:0; font-size:20px;">👤 Kullanıcı Profili</h2>
+    <div style="background:var(--card-bg); padding:15px; border-radius:12px; margin:15px 0; border:2px solid var(--border); text-align:left;">
+      <p style="margin:8px 0; font-size:13px;">Toplam Kazanılan XP: <b id="profileXP" style="color:var(--secondary);">0</b></p>
+      <p style="margin:8px 0; font-size:13px;">Seri (Streak): <b id="profileStreak" style="color:var(--warning);">1 Gün 🔥</b></p>
+      <p style="margin:8px 0; font-size:13px;">Elmas Miktarı: <b id="profileGems" style="color:var(--gem);">50 💎</b></p>
+    </div>
+    <h4 style="font-size:14px; margin-bottom:10px; color:var(--text);">🏆 Başarı Rozetleri</h4>
+    <div class="badge-container">
+      <div class="badge" id="badge1" title="100 XP Topla">🌱</div>
+      <div class="badge" id="badge2" title="300 XP Topla">🚀</div>
+      <div class="badge" id="badge3" title="500 XP Topla">⚡</div>
+    </div>
+    <button class="pro-btn" id="profileBackBtn" style="margin-top:20px;">GERİ DÖN</button>
+  </div>
+
+  <!-- 8. GÜNLÜK GÖREVLER EKRANI -->
+  <div id="questScreen" class="screen">
+    <h2 style="color:var(--secondary); text-align:center; margin-top:0; font-size:20px;">🎯 Günlük Görevler</h2>
+    <p style="color:var(--text-muted); font-size:12px; text-align:center; margin-bottom:15px;">Görevleri tamamla, ekstra elmas kazan!</p>
+    
+    <div class="category-card" style="justify-content:space-between; margin-bottom:10px;">
+      <div style="text-align:left;">
+        <h4 style="margin:0 0 4px 0; font-size:13px;">📚 1 Ders Tamamla</h4>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);" id="quest1Status">Durum: Tamamlanmadı</p>
+      </div>
+      <span style="font-weight:bold; color:var(--warning); font-size:12px;">+10 💎</span>
+    </div>
+
+    <div class="category-card" style="justify-content:space-between; margin-bottom:15px;">
+      <div style="text-align:left;">
+        <h4 style="margin:0 0 4px 0; font-size:13px;">💎 Mağazayı Ziyaret Et</h4>
+        <p style="margin:0; font-size:11px; color:var(--text-muted);" id="quest2Status">Durum: Tamamlanmadı</p>
+      </div>
+      <span style="font-weight:bold; color:var(--warning); font-size:12px;">+5 💎</span>
+    </div>
+
+    <button class="pro-btn" id="questBackBtn">GERİ DÖN</button>
+  </div>
+</div>
+
+<script>
+// KELİME ARŞİVİ VE VERİTABANI
+const database = {
+    beginner: [
+        { q: "Hello, how are you today?", t: "en", options: ["Merhaba, bugün nasılsın?", "İyi akşamlar dilerim", "Görüşmek üzere", "Teşekkür ederim"], correct: 0, audioText: "Hello, how are you today?" },
+        { q: "Ben kahve içmeyi seviyorum.", t: "tr", options: ["I like to drink water.", "I like to drink coffee.", "Coffee is very hot.", "I have a cup."], correct: 1, audioText: "I like to drink coffee." },
+        { q: "The weather is very nice outside.", t: "en", options: ["Dışarıda hava çok güzel.", "Hava oldukça soğuk.", "Yağmur yağıyor.", "Güneş batıyor."], correct: 0, audioText: "The weather is very nice outside." },
+        { q: "Teşekkür ederim, borcum ne kadar?", t: "tr", options: ["Thank you, how much is it?", "Hello, where is the door?", "Good morning my friend.", "See you tomorrow."], correct: 0, audioText: "Thank you, how much is it?" },
+        { q: "My name is John and I live in London.", t: "en", options: ["Adım John ve Londra'da yaşıyorum.", "Benim adın Ahmet ve İzmir'deyim.", "John ile birlikte Londra'ya gittim.", "Londra'yı çok seviyorum."], correct: 0, audioText: "My name is John and I live in London." }
+    ],
+    intermediate: [
+        { q: "Actions speak louder than words.", t: "en", options: ["Lafla peynir gemisi yürümez.", "Söz gümüşse sükut altındır.", "Dost kara günde belli olur.", "İşleyen demir pas tutmaz."], correct: 0, audioText: "Actions speak louder than words." },
+        { q: "Zaman her şeyin en iyi ilacıdır.", t: "tr", options: ["Time heals all wounds.", "Better late than never.", "Time is money.", "Every dog has its day."], correct: 0, audioText: "Time heals all wounds." },
+        { q: "If I had more time, I would travel the world.", t: "en", options: ["Daha fazla vaktim olsaydı dünyayı gezerdim.", "Zamanım olursa seyahat edeceğim.", "Dünyayı gezmek için çok zamanım var.", "Seyahat etmeyi hiç sevmem."], correct: 0, audioText: "If I had more time, I would travel the world." }
+    ],
+    advanced: [
+        { q: "Success is not final, failure is not fatal.", t: "en", options: ["Başarı nihai değildir, başarısızlık ölümcül değildir.", "Asla pes etmemelisin.", "Korkularıyla yüzleşen kazanır.", "Zafer inananlarındır."], correct: 0, audioText: "Success is not final, failure is not fatal." },
+        { q: "It is crucial to analyze the data objectively.", t: "en", options: ["Verileri tarafsız bir şekilde analiz etmek çok önemlidir.", "Sonuçları hemen tahmin etmeliyiz.", "Rakamlar her zaman yanıltıcıdır.", "Bilimsel çalışmalar durdurulmalıdır."], correct: 0, audioText: "It is crucial to analyze the data objectively." }
+    ],
+    daily: [
+        { q: "Can you help me, please?", t: "en", options: ["Lütfen bana yardım edebilir misin?", "Beni yalnız bırakır mısın?", "Saatin kaç olduğunu biliyor musun?", "Nereye gidiyorsun?"], correct: 0, audioText: "Can you help me, please?" },
+        { q: "Bunu anlıyorum.", t: "tr", options: ["I understand this.", "I don't know.", "What is this?", "It is impossible."], correct: 0, audioText: "I understand this." }
+    ]
+};
+
+let gameState = {
+    xp: parseInt(localStorage.getItem('linguapro_xp')) || 0,
+    streak: parseInt(localStorage.getItem('linguapro_streak')) || 1,
+    gems: parseInt(localStorage.getItem('linguapro_gems')) || 50,
+    darkMode: localStorage.getItem('linguapro_dark') === 'true',
+    dictionary: JSON.parse(localStorage.getItem('linguapro_dict')) || [],
+    badges: JSON.parse(localStorage.getItem('linguapro_badges')) || [false, false, false]
+};
+
+let currentCategory = [];
+let currentIndex = 0;
+let sessionXP = 0;
+let hearts = 3;
+let selectedOption = null;
+let currentState = 'check';
+
+let mediaRecorder;
+let audioChunks = [];
+let recordedAudioBlob = null;
+let recordedAudioUrl = null;
+
+const screens = {};
+
+function playSound(type) {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'error') {
+            osc.frequency.setValueAtTime(200, ctx.currentTime);
+            osc.frequency.setValueAtTime(150, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        }
+    } catch(e) {}
+}
+
+function playOwlHoot() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+        
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(320, now);
+        osc1.frequency.exponentialRampToValueAtTime(280, now + 0.2);
+        gain1.gain.setValueAtTime(0.15, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.25);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(270, now + 0.3);
+        osc2.frequency.exponentialRampToValueAtTime(230, now + 0.6);
+        gain2.gain.setValueAtTime(0.15, now + 0.3);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.65);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.3);
+        osc2.stop(now + 0.65);
+    } catch(e) {}
+}
+
+function owlSpeak(text, langCode = 'tr-TR') {
+    playOwlHoot();
+    setTimeout(() => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langCode;
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+    }, 700);
+}
+
+function toggleRecording(statusElementId, playBtnId) {
+    const statusEl = document.getElementById(statusElementId);
+    const playBtn = document.getElementById(playBtnId);
+
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                recordedAudioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                recordedAudioUrl = URL.createObjectURL(recordedAudioBlob);
+                if(playBtn) playBtn.disabled = false;
+                if(statusEl) statusEl.innerText = "Kayıt tamamlandı! Dinleyebilirsiniz.";
+            };
+
+            mediaRecorder.start();
+            if(statusEl) statusEl.innerText = "🎙️ Kaydediliyor... Konuşun!";
+            document.querySelectorAll(".mic-btn").forEach(b => b.classList.add("recording"));
+        }).catch(err => {
+            alert("Mikrofon izni alınamadı!");
+        });
+    } else {
+        mediaRecorder.stop();
+        document.querySelectorAll(".mic-btn").forEach(b => b.classList.remove("recording"));
+    }
+}
+
+function playRecordedAudio() {
+    if (recordedAudioUrl) {
+        const audio = new Audio(recordedAudioUrl);
+        audio.play();
+    }
+}
+
+function initApp() {
+    screens.menu = document.getElementById("menuScreen");
+    screens.quiz = document.getElementById("quizScreen");
+    screens.studio = document.getElementById("studioScreen");
+    screens.finish = document.getElementById("finishScreen");
+    screens.dict = document.getElementById("dictScreen");
+    screens.shop = document.getElementById("shopScreen");
+    screens.profile = document.getElementById("profileScreen");
+    screens.quest = document.getElementById("questScreen");
+
+    if (gameState.darkMode) document.body.classList.add("dark-mode");
+    updateMenuStats();
+
+    document.getElementById("themeBtn").onclick = toggleDarkMode;
+    document.getElementById("dictBtn").onclick = openDictionary;
+    document.getElementById("shopBtn").onclick = openShop;
+    document.getElementById("studioBtn").onclick = openStudio;
+    document.getElementById("profileBtn").onclick = openProfile;
+    document.getElementById("questBtn").onclick = openQuests;
+    
+    document.getElementById("menuBackBtn").onclick = returnToMenu;
+    document.getElementById("studioBackBtn").onclick = returnToMenu;
+    document.getElementById("finishBackBtn").onclick = returnToMenu;
+    document.getElementById("dictBackBtn").onclick = returnToMenu;
+    document.getElementById("shopBackBtn").onclick = returnToMenu;
+    document.getElementById("profileBackBtn").onclick = returnToMenu;
+    document.getElementById("questBackBtn").onclick = returnToMenu;
+
+    document.getElementById("buyHeartBtn").onclick = buyHeart;
+    document.getElementById("buyBonusBtn").onclick = claimBonus;
+    document.getElementById("checkBtn").onclick = handleAction;
+    document.getElementById("audioBtn").onclick = speakText;
+
+    document.getElementById("micBtn").onclick = () => toggleRecording("charSpeech", "playRecBtn");
+    document.getElementById("playRecBtn").onclick = playRecordedAudio;
+
+    document.getElementById("studioMicBtn").onclick = () => toggleRecording("studioStatus", "studioPlayBtn");
+    document.getElementById("studioPlayBtn").onclick = playRecordedAudio;
+    
+    document.getElementById("charAvatar").onclick = () => {
+        const messages = [
+            "Hoo-hoo! Kelime haznesi sürekli seninle büyüyor!",
+            "Hoo-hoo! Stüdyoda sesini kaydetmeyi unutma!",
+            "Hoo-hoo! Harika bir çalışma seansı olsun!"
+        ];
+        const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+        document.getElementById("charSpeech").innerText = randomMsg;
+        owlSpeak(randomMsg, 'tr-TR');
+    };
+
+    document.querySelectorAll(".category-card[data-level]").forEach(card => {
+        card.onclick = () => startQuiz(card.getAttribute("data-level"));
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", initApp);
+} else {
+    initApp();
+}
+
+function toggleDarkMode() {
+    gameState.darkMode = !gameState.darkMode;
+    document.body.classList.toggle("dark-mode", gameState.darkMode);
+    localStorage.setItem('linguapro_dark', gameState.darkMode);
+}
+
+function updateMenuStats() {
+    document.getElementById("totalLifetimeXP").innerText = gameState.xp;
+}
+
+function updateGameUI() {
+    document.getElementById("statStreak").innerText = gameState.streak;
+    document.getElementById("statGems").innerText = gameState.gems;
+    document.getElementById("statHearts").innerText = "❤️".repeat(hearts) + "🖤".repeat(3 - hearts);
+}
+
+function switchScreen(screenName) {
+    Object.keys(screens).forEach(key => {
+        if(screens[key]) screens[key].classList.toggle("active", key === screenName);
+    });
+    document.getElementById("topStats").classList.toggle("hidden", screenName === 'menu');
+    if(screenName === 'menu') updateMenuStats();
+}
+
+function startQuiz(categoryKey) {
+    currentCategory = database[categoryKey];
+    currentIndex = 0;
+    sessionXP = 0;
+    hearts = 3;
+    updateGameUI();
+    switchScreen('quiz');
+    loadQuestion();
+}
+
+function openStudio() {
+    switchScreen('studio');
+}
+
+function loadQuestion() {
+    currentState = 'check';
+    selectedOption = null;
+    document.getElementById("checkBtn").disabled = true;
+    document.getElementById("checkBtn").innerText = "KONTROL ET";
+    document.getElementById("feedbackCard").classList.add("hidden");
+    document.getElementById("playRecBtn").disabled = true;
+
+    const qData = currentCategory[currentIndex];
+    let speechText = "";
+    if (qData.t === 'en') {
+        document.getElementById("questionText").innerHTML = `İngilizce Cümle:<br><b>"${qData.q}"</b>`;
+        speechText = "Hoo-hoo! İngilizce cümle: " + qData.q;
+    } else {
+        document.getElementById("questionText").innerHTML = `Türkçe Cümle:<br><b>"${qData.q}"</b>`;
+        speechText = "Hoo-hoo! Türkçe cümle: " + qData.q;
+    }
+
+    document.getElementById("charSpeech").innerText = qData.q;
+    owlSpeak(speechText, 'tr-TR');
+
+    const optContainer = document.getElementById("optionsContainer");
+    optContainer.innerHTML = "";
+    qData.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => selectOption(idx, btn);
+        optContainer.appendChild(btn);
+    });
+
+    document.getElementById("progressBar").style.width = (currentIndex / currentCategory.length) * 100 + "%";
+}
+
+function selectOption(index, btnElement) {
+    if (currentState === 'next') return;
+    document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+    btnElement.classList.add("selected");
+    selectedOption = index;
+    document.getElementById("checkBtn").disabled = false;
+}
+
+function handleAction() {
+    if (currentState === 'check') verifyAnswer();
+    else moveToNext();
+}
+
+function verifyAnswer() {
+    if (selectedOption === null) return;
+    currentState = 'next';
+    const qData = currentCategory[currentIndex];
+    const optionButtons = document.querySelectorAll(".option-btn");
+    const feedbackCard = document.getElementById("feedbackCard");
+
+    feedbackCard.classList.remove("hidden");
+    document.getElementById("checkBtn").innerText = "DEVAM ET";
+
+    if (selectedOption === qData.correct) {
+        sessionXP += 20;
+        playSound('success');
+        feedbackCard.className = "footer-card correct";
+        document.getElementById("feedbackTitle").innerText = "Mükemmel!";
+        document.getElementById("feedbackSub").innerText = "Çevirin doğru.";
+        optionButtons[selectedOption].style.backgroundColor = "rgba(88, 204, 2, 0.2)";
+
+        document.getElementById("charSpeech").innerText = "Hoo-hoo! Harika, doğru cevap.";
+        owlSpeak("Hoo-hoo! Harika, doğru cevap.", 'tr-TR');
+
+        if(!gameState.dictionary.some(item => item.q === qData.q)) {
+            gameState.dictionary.push({ q: qData.q, a: qData.options[qData.correct] });
+            localStorage.setItem('linguapro_dict', JSON.stringify(gameState.dictionary));
+        }
+    } else {
+        hearts--;
+        playSound('error');
+        feedbackCard.className = "footer-card wrong";
+        document.getElementById("feedbackTitle").innerText = "Yanlış Cevap!";
+        document.getElementById("feedbackSub").innerText = "Doğrusu: " + qData.options[qData.correct];
+        optionButtons[selectedOption].style.backgroundColor = "rgba(255, 75, 75, 0.2)";
+        optionButtons[qData.correct].style.backgroundColor = "rgba(88, 204, 2, 0.2)";
+
+        const wrongMsg = "Hoo-hoo! Yanlış cevap. Doğrusu: " + qData.options[qData.correct];
+        document.getElementById("charSpeech").innerText = wrongMsg;
+        owlSpeak(wrongMsg, 'tr-TR');
+    }
+
+    updateGameUI();
+    if (hearts <= 0) setTimeout(() => finishGame(true), 1500);
+}
+
+function moveToNext() {
+    currentIndex++;
+    if (currentIndex < currentCategory.length) {
+        loadQuestion();
+    } else {
+        finishGame(false);
+    }
+}
+
+function finishGame(isFailed) {
+    switchScreen('finish');
+    document.getElementById("progressBar").style.width = "100%";
+    gameState.xp += sessionXP;
+    if(!isFailed) { 
+        gameState.streak += 1; 
+        gameState.gems += 15; 
+        if(gameState.xp >= 100) gameState.badges[0] = true;
+        if(gameState.xp >= 300) gameState.badges[1] = true;
+        if(gameState.xp >= 500) gameState.badges[2] = true;
+    }
+    localStorage.setItem('linguapro_xp', gameState.xp);
+    localStorage.setItem('linguapro_streak', gameState.streak);
+    localStorage.setItem('linguapro_gems', gameState.gems);
+    localStorage.setItem('linguapro_badges', JSON.stringify(gameState.badges));
+
+    document.getElementById("finalXP").innerText = sessionXP;
+    owlSpeak("Hoo-hoo! Tebrikler, dersi başarıyla tamamladın!", 'tr-TR');
+}
+
+function openDictionary() {
+    switchScreen('dict');
+    const dictList = document.getElementById("dictList");
+    dictList.innerHTML = gameState.dictionary.length === 0 ? "<p style='text-align:center; color:var(--text-muted);'>Henüz sözlükte kelime yok.</p>" : "";
+    gameState.dictionary.forEach(item => {
+        const div = document.createElement("div");
+        div.style.cssText = "display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px;";
+        div.innerHTML = `<b>${item.q}</b> <span style="color:var(--primary)">➔ ${item.a}</span>`;
+        dictList.appendChild(div);
+    });
+}
+
+function openShop() { 
+    switchScreen('shop'); 
+}
+
+function openProfile() {
+    switchScreen('profile');
+    document.getElementById("profileXP").innerText = gameState.xp;
+    document.getElementById("profileStreak").innerText = gameState.streak + " Gün 🔥";
+    document.getElementById("profileGems").innerText = gameState.gems;
+
+    if(gameState.badges[0]) document.getElementById("badge1").classList.add("unlocked");
+    if(gameState.badges[1]) document.getElementById("badge2").classList.add("unlocked");
+    if(gameState.badges[2]) document.getElementById("badge3").classList.add("unlocked");
+}
+
+function openQuests() {
+    switchScreen('quest');
+    if(sessionXP > 0) {
+        document.getElementById("quest1Status").innerText = "Durum: Tamamlandı! ✅";
+        document.getElementById("quest1Status").style.color = "var(--primary)";
+    }
+}
+
+function buyHeart() {
+    if(gameState.gems >= 20) {
+        gameState.gems -= 20;
+        hearts = 3;
+        localStorage.setItem('linguapro_gems', gameState.gems);
+        updateGameUI();
+        alert("Can yenilendi! ❤️");
+    } else {
+        alert("Yetersiz elmas! 💎");
+    }
+}
+
+function claimBonus() {
+    gameState.gems += 25;
+    localStorage.setItem('linguapro_gems', gameState.gems);
+    alert("🎁 Günlük sandık açıldı: +25 Elmas eklendi!");
+}
+
+function returnToMenu() { 
+    switchScreen('menu'); 
+}
+
+function speakText() {
+    const q = currentCategory[currentIndex];
+    if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(q.audioText);
+        u.lang = q.t === 'en' ? 'en-US' : 'tr-TR';
+        window.speechSynthesis.speak(u);
+    }
+}
+</script>
+
+</body>
+<style>html{
+ color:darkviolet;
+ font-size:25px;
+ font-weight:600;
+}
+</style><script>/*Here write your javascript code*/</script></html>
